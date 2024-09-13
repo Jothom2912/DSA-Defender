@@ -21,6 +21,8 @@ function start() {
   resetGame();
   // begin the loop
   requestAnimationFrame(loop);
+
+
 }
 
 function resetGame() {
@@ -36,31 +38,75 @@ function resetGame() {
 // the list of enemies is an array of size 5 - but it could be larger ...
 const enemies = new StaticArray(5); 
 
+let firstEnemy = null; 
+
 function createInitialEnemies() {
- // create five enemies
+ // Spawner 5 enemies da i er 5
   for (let i = 0; i < 5; i++) {
     enemies[i] = spawnNewEnemy();
   }
 }
 
-// creates a new enemy object, and adds it to the list of enemies
+// Kalder funktionen createEnemy når firstEnemy er null. Hvis ikke firstEnemy er null
+// Bliver den næste i rækken til firstEnemy indtil den finder en der er null, med mindre der ik er nogen hvilket betyder der er 5
+
 function spawnNewEnemy() {
   const enemy = createEnemy();
-  // TODO: need to add new enemy to list of enemies, here!
+
+  if(firstEnemy == null) {
+    firstEnemy = enemy
+  } else {
+    enemy.next = firstEnemy
+    firstEnemy = enemy;
+  }
   
   return enemy;
 }
 
 // removes an enemy object from the list of enemies
 function removeEnemy(enemy) {
-  // TODO: need to find enemy object in list of enemies, and remove it
+
+  // Så hvis den første enemy du clicker på er FirstEnemy(Altså den første i min liste), vil den fjerne
+  // den og bruge den næste enemy i min linkedlist som FirstEnemy
+  // jeg sætter current til first enemy så mit loop starter der. Jeg looper her efter igennem min liste
+  // current.next !== null sørge for jeg looper igennem min liste så længe der er en enemy
+  // current.next !== enemy looper igennem indtil den finder enemy. Efter som removeEnemy bliver kaldt
+  // er det altså den enemy vi leder efter removeEnemy(enemy). Altså når current = enemy ved vi der er den
+  if (firstEnemy === enemy) {
+    console.log("Removing the first enemy:", enemy);
+    firstEnemy = enemy.next;
+    } else {
+      let current = firstEnemy;
+      while (current.next !== null && current.next !== enemy) {
+        current = current.next;
+      }
+      if (current.next === enemy) {
+        console.log("Removing enemy:", enemy);
+        current.next = enemy.next;
+      } else {
+        console.log("Enemy not found in the list:", enemy);
+      }
+    }
+  }
   
-}
+
 
 // returns the number of enemy objects in the list of enemies
 function numberOfEnemies() {
-  // TODO: need to return the number of actual enemies, not the size of the array
-  return enemies.length;
+  
+  function numberOfEnemies() {
+    let count = 0;
+    let current = firstEnemy;
+  
+    // Jeg looper igennem min liste a enemies indtil den er null, hvilket vil være 5.
+    while (current !== null) {
+      count++;
+      current = current.next;
+    }
+  
+    return count;
+  }
+
 }
 
 // ************************************************
@@ -165,6 +211,11 @@ function loop() {
   // ****
   // Loop through all enemies - and move them until the reach the bottom
   // ****
+
+
+let enemy = firstEnemy;
+while (enemy){
+
   for (const enemy of enemies) {
     // TODO: Only look at actual enemy objects from the list ...
 
@@ -177,6 +228,8 @@ function loop() {
       }
     }
   }
+    enemy = enemy.next;
+}
 
   // Check for game over
   if (health <= 0) {
@@ -193,10 +246,14 @@ function loop() {
   // ****
   // Loop through all enemies - and update their visuals
   // ****
+
+
+
   for (const enemy of enemies) {
     // TODO: Only do this for actual enemy objects from the list ...
     displayEnemy(enemy);
   }
+
 
   // update health display
   displayHealth();
@@ -206,6 +263,9 @@ function loop() {
     requestAnimationFrame(loop);
   }
 }
+
+
+
 
 function enemyHitBottom(enemy) {
   console.log("Enemy attacked base!");
